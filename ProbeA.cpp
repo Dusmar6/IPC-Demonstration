@@ -29,11 +29,11 @@ int main() {
 
     do {
         msg.mtype = rand();
-        strcpy(msg.content, "Message!");
+        strcpy(msg.content, "Probe A Message");
         msgsnd(qid, (struct msgbuf *)&msg, size, 0);
 
-        msgrcv(qid, (struct msgbuf *)&msg, size, 0);
-        
+        msgrcv(qid, (struct msgbuf *)&msg, size, 67, 0);
+
     } while (msg.mtype > 100);
 
     exit(0);
