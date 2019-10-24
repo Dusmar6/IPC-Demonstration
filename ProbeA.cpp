@@ -14,10 +14,14 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdlib>
+#include <string>
+
+using namespace std;
 
 int main() {
-
-    int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
+    //int alpha = 997, beta = 257, rho = 251;
+    int magic_seed = 997; //alpha
+    int qid = msgget(ftok(".",'u'), 0); 
 
     struct buf {
 		long mtype; // required
@@ -26,13 +30,21 @@ int main() {
 
     buf msg;
     int size = sizeof(msg) - sizeof(long);
-
+    int pid = getpid();
+    int return_mtype;
+    
     do {
-        msg.mtype = rand();
-        strcpy(msg.content, "Probe A Message");
-        msgsnd(qid, (struct msgbuf *)&msg, size, 0);
+        msg.mtype = return_mtype = rand();
+        
+        if (msg.mtype % magic_seed == 0) {
+            strcpy(msg.content, to_string(pid).c_str()); // add pid to msg.content in 
+                                                         // form of C-string
+            
+            msgsnd(qid, (struct msgbuf *)&msg, size, 0);
+            msgrcv(qid, (struct msgbuf *)&msg, size, return_mtype, 0);
 
-        msgrcv(qid, (struct msgbuf *)&msg, size, 67, 0);
+            cout << msg.content << ": " << msg.mtype << endl;
+        }
 
     } while (msg.mtype > 100);
 
