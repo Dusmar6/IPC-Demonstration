@@ -20,7 +20,7 @@ using namespace std;
 
 int main() {
     //int alpha = 997, beta = 257, rho = 251;
-    int magic_seed = 997; //alpha
+    int magic_seed = 3359; //alpha
     int qid = msgget(ftok(".",'u'), 0); 
 
     struct buf {
