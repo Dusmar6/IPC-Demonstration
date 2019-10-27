@@ -39,7 +39,6 @@ int main() {
         if (msg.mtype % magic_seed == 0) {
             strcpy(msg.content, to_string(pid).c_str()); // add pid to msg.content in 
                                                          // form of C-string
-            
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
             msgrcv(qid, (struct msgbuf *)&msg, size, return_mtype, 0);
 

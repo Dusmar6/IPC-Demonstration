@@ -15,6 +15,12 @@
 
 using namespace std;
 
+int kill_process(process_PID){
+
+    //TODO Run Kill Process program
+
+}
+
 int main() {
     int alpha = 997, beta = 257, rho = 251;
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
@@ -26,18 +32,25 @@ int main() {
 
     buf msg;
     int size = sizeof(msg) - sizeof(long);
-
     bool running = true;
     buf reply;
     int msg_count = 0;
+    bool probe_b_running = true;
+    int probe_b_PID;
 
     while (running) {
 
+        if (probe_b_running & msg_count>9999){
+            kill_process(probe_b_PID);
+            probe_b_running = false;
+        }
+
         //msgrcv recieves all message types
         if (msgrcv(qid, (struct msgbuf *)&msg, size, 0, 0) > -1) {
+            msg_count++;
 
             // message is from ProbeA
-            if (msg.mtype % alpha == 0) {
+            if (msg.mtype % alpha == 0) { //Probe A
 
                 cout << "DataHub recieved data from Probe A PID: " << msg.content << endl;
                 cout << "MsgType is: " << msg.mtype << endl; 
@@ -45,13 +58,15 @@ int main() {
                 strcpy(reply.content, "DataHub received message");
                 msgsnd(qid, (struct msgbuf *)&reply, size, 0);
 
-            } else if (msg.mtype % beta == 0) {
-
-                //TODO: recieve data from probe B
-
-            } else if (msg.mtype % rho == 0) {
-
-                //TODO: recieve data from probe C
+            } else if (msg.mtype % beta == 0) { //Probe B
+                cout << "DataHub recieved data from Probe B PID: " << msg.content << endl;
+                cout << "MsgType is: " << msg.mtype << endl; 
+                
+                probe_b_PID = //TODO Get PID from Probe B message
+                
+            } else if (msg.mtype % rho == 0) { //Probe C
+                cout << "DataHub recieved data from Probe C PID: " << msg.content << endl;
+                cout << "MsgType is: " << msg.mtype << endl; 
 
             } else {break;}
         } else {
