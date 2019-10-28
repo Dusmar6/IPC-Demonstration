@@ -19,8 +19,8 @@
 using namespace std;
 
 int main() {
-    //int alpha = 997, beta = 257, rho = 251;
-    int magic_seed = 997; //alpha
+
+    int magic_seed = 21011; // alpha
     int qid = msgget(ftok(".",'u'), 0); 
 
     struct buf {
@@ -31,7 +31,7 @@ int main() {
     buf msg;
     int size = sizeof(msg) - sizeof(long);
     int pid = getpid();
-    int return_mtype = 20;
+    int return_mtype = 2000;
     int rand_num;
     
     do {
@@ -41,13 +41,11 @@ int main() {
             msg.mtype = magic_seed;
             strncpy(msg.content, to_string(pid).c_str(), size); // add pid to msg.content in 
                                                                 // form of C-string
+            cout << "Probe A: " << msg.content << ": " << msg.mtype << endl;
+
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
-
-            cout << "Sending: Probe A: " << msg.content << ": " << msg.mtype << endl;
-
             msgrcv(qid, (struct msgbuf *)&msg, size, return_mtype, 0);
-
-            cout << "Recieving from Data Hub: " << msg.content << ": " << msg.mtype << endl;
+            cout << msg.content << ": " << msg.mtype << endl;
 
         }
 

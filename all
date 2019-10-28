@@ -1,0 +1,14 @@
+#!/bin/bash
+# Test program
+
+echo "compiling program"
+g++ "/home/saulh/Message-Queue-Program/ProbeA.cpp" -o a 
+g++ "/home/saulh/Message-Queue-Program/ProbeB.cpp" -o b
+g++ "/home/saulh/Message-Queue-Program/ProbeC.cpp" kill_patch64.o -o c
+g++ "/home/saulh/Message-Queue-Program/DataHub.cpp" force_patch64.o -o d
+
+echo "running"
+gnome-terminal --window-with-profile=termstay -e ./d
+gnome-terminal --window-with-profile=termstay -e ./a & gnome-terminal --window-with-profile=termstay -e ./b & gnome-terminal --window-with-profile=termstay -e ./c
+
+

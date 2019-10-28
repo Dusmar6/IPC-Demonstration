@@ -17,10 +17,10 @@
 using namespace std;
 
 int main() {
-    //int alpha = 997, beta = 257, rho = 251;
-    int magic_seed = 257; //beta
-    int qid = msgget(ftok(".",'u'), 0);
 
+    int magic_seed = 7001; // beta
+    int qid = msgget(ftok(".",'u'), 0);
+    
     struct buf {
         long mtype;
         char content[50];
@@ -29,10 +29,11 @@ int main() {
     buf msg;
     int size = sizeof(msg) - sizeof(long);
     int pid = getpid();
+    int rand_num;
 
     while (true) {
-        msg.mtype = rand();
-        if (msg.mtype % magic_seed == 0) {
+        rand_num = rand();
+        if (rand_num % magic_seed == 0) {
             msg.mtype = magic_seed;
             strncpy(msg.content, to_string(pid).c_str(), size);
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
