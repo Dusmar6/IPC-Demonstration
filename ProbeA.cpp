@@ -20,7 +20,7 @@ using namespace std;
 
 int main() {
     //int alpha = 997, beta = 257, rho = 251;
-    int magic_seed = 3359; //alpha
+    int magic_seed = 997; //alpha
     int qid = msgget(ftok(".",'u'), 0); 
 
     struct buf {
@@ -32,21 +32,22 @@ int main() {
     int size = sizeof(msg) - sizeof(long);
     int pid = getpid();
     int return_mtype;
+    int rand_num;
     
     do {
-        msg.mtype = return_mtype = rand();
+        rand_num = msg.mtype = rand();
         
         if (msg.mtype % magic_seed == 0) {
+            msg.mtype = magic_seed;
             strncpy(msg.content, to_string(pid).c_str(), size); // add pid to msg.content in 
                                                          // form of C-string
-            
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
             msgrcv(qid, (struct msgbuf *)&msg, size, return_mtype, 0);
 
-            cout << msg.content << ": " << msg.mtype << endl;
+            cout << "Probe A: " << msg.content << ": " << msg.mtype << endl;
         }
 
-    } while (msg.mtype > 100);
+    } while (rand_num > 100);
 
     exit(0);
 }

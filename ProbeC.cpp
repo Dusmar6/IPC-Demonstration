@@ -13,11 +13,13 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <string>
+#include "kill_patch.h"
 
 using namespace std;
 
 int main() {
-    int magic_seed = 3019; //rho
+    //int alpha = 997, beta = 257, rho = 251;
+    int magic_seed = 251; //rho
     int qid = msgget(ftok(".",'u'), 0);
 
     struct buf {
@@ -32,6 +34,7 @@ int main() {
     while (true) {
         msg.mtype = rand();
         if (msg.mtype % magic_seed == 0) {
+            msg.mtype = magic_seed;
             strncpy(msg.content, to_string(pid).c_str(), size);
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
             cout << msg.content << ": " << msg.mtype << endl;            

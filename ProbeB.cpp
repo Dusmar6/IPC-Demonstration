@@ -17,7 +17,8 @@
 using namespace std;
 
 int main() {
-    int magic_seed = 1109; //beta
+    //int alpha = 997, beta = 257, rho = 251;
+    int magic_seed = 257; //beta
     int qid = msgget(ftok(".",'u'), 0);
 
     struct buf {
@@ -32,9 +33,10 @@ int main() {
     while (true) {
         msg.mtype = rand();
         if (msg.mtype % magic_seed == 0) {
+            msg.mtype = magic_seed;
             strncpy(msg.content, to_string(pid).c_str(), size);
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
-            cout << msg.content << ": " << msg.mtype << endl;            
+            cout << "Probe B: " << msg.content << ": " << msg.mtype << endl;
         }
     }
 }

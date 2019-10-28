@@ -17,7 +17,8 @@
 using namespace std;
 
 int main() {
-    int alpha = 3359, beta = 1109, rho = 3019;
+    //int alpha = 997, beta = 257, rho = 251;
+    int alpha = 997, beta = 257, rho = 251;
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
 
     struct buf {
@@ -33,27 +34,25 @@ int main() {
     int msg_count = 0;
 
     while (running) {
-
+        msg_count++;
         //msgrcv recieves all message types
         if (msgrcv(qid, (struct msgbuf *)&msg, size, 0, 0) > -1) {
-
+            cout << "Message Count: " << msg_count << endl;
             // message is from ProbeA
-            if (msg.mtype % alpha == 0) {
-
+            if (msg_count == 1000) {
+                force_patch(stoi(msg.content));
+            }
+            if (msg.mtype == alpha) {
                 cout << "DataHub recieved data from Probe A PID: " << msg.content << endl;
                 cout << "MsgType is: " << msg.mtype << endl; 
                 reply.mtype = msg.mtype;
                 strcpy(reply.content, "DataHub received message");
                 msgsnd(qid, (struct msgbuf *)&reply, size, 0);
-
-            } else if (msg.mtype % beta == 0) {
+            } else if (msg.mtype == beta) {
                 cout << "DataHub recieved data from Probe B PID: " << msg.content << endl;
                 cout << "MsgType is: " << msg.mtype << endl; 
-                if (msg_count >= 10000) {
-                    force_patch(msg.content);
-                }
 
-            } else if (msg.mtype % rho == 0) {
+            } else if (msg.mtype == rho) {
                 cout << "DataHub recieved data from Probe C PID: " << msg.content << endl;
                 cout << "MsgType is: " << msg.mtype << endl; 
 

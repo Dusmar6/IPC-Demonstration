@@ -3,6 +3,4 @@
 
 // the function signals the process to terminate (SIGKILL)
 // pid of the process to terminate
-void force_patch(pid_t pid) {
-    kill(pid, 0);
-}
+void force_patch(pid_t pid);
