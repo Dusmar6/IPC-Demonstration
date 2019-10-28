@@ -32,36 +32,42 @@ int main() {
     bool running = true;
     buf reply;
     int msg_count = 0;
+    pid_t b_pid;
 
     while (running) {
-        msg_count++;
         //msgrcv recieves all message types
         if (msgrcv(qid, (struct msgbuf *)&msg, size, 0, 0) > -1) {
+            msg_count++;
             cout << "Message Count: " << msg_count << endl;
             // message is from ProbeA
             if (msg_count == 1000) {
-                force_patch(stoi(msg.content));
+                force_patch(b_pid);
             }
             if (msg.mtype == alpha) {
                 cout << "DataHub recieved data from Probe A PID: " << msg.content << endl;
                 cout << "MsgType is: " << msg.mtype << endl; 
-                reply.mtype = msg.mtype;
-                strcpy(reply.content, "DataHub received message");
+                reply.mtype = 20;
+                strncpy(reply.content, "DataHub received message", size);
                 msgsnd(qid, (struct msgbuf *)&reply, size, 0);
+
             } else if (msg.mtype == beta) {
                 cout << "DataHub recieved data from Probe B PID: " << msg.content << endl;
-                cout << "MsgType is: " << msg.mtype << endl; 
+                cout << "MsgType is: " << msg.mtype << endl;
+                b_pid = stoi(msg.content);
 
             } else if (msg.mtype == rho) {
                 cout << "DataHub recieved data from Probe C PID: " << msg.content << endl;
                 cout << "MsgType is: " << msg.mtype << endl; 
 
-            } else {break;}
-        } else {
-            running = false;
+            } else if (msg.mtype == 10) {
+                cout << msg.content << endl;
+                break;
+            }
         }
     }
+    cout << "Check messages\n";
 
+    getchar();
     msgctl(qid, IPC_RMID, NULL);
     ::exit(0);
 }

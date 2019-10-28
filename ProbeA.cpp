@@ -31,23 +31,27 @@ int main() {
     buf msg;
     int size = sizeof(msg) - sizeof(long);
     int pid = getpid();
-    int return_mtype;
+    int return_mtype = 20;
     int rand_num;
     
     do {
-        rand_num = msg.mtype = rand();
+        rand_num = rand();
         
-        if (msg.mtype % magic_seed == 0) {
+        if (rand_num % magic_seed == 0) {
             msg.mtype = magic_seed;
             strncpy(msg.content, to_string(pid).c_str(), size); // add pid to msg.content in 
-                                                         // form of C-string
+                                                                // form of C-string
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
+
+            cout << "Sending: Probe A: " << msg.content << ": " << msg.mtype << endl;
+
             msgrcv(qid, (struct msgbuf *)&msg, size, return_mtype, 0);
 
-            cout << "Probe A: " << msg.content << ": " << msg.mtype << endl;
+            cout << "Recieving from Data Hub: " << msg.content << ": " << msg.mtype << endl;
+
         }
 
     } while (rand_num > 100);
-
+    cout << "Probe A terminating\n";
     exit(0);
 }
