@@ -12,11 +12,12 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdlib>
+#include "force_patch.h"
 
 using namespace std;
 
 int main() {
-    int alpha = 997, beta = 257, rho = 251;
+    int alpha = 3359, beta = 1109, rho = 3019;
     int qid = msgget(ftok(".",'u'), IPC_EXCL|IPC_CREAT|0600);
 
     struct buf {
@@ -46,12 +47,15 @@ int main() {
                 msgsnd(qid, (struct msgbuf *)&reply, size, 0);
 
             } else if (msg.mtype % beta == 0) {
-
-                //TODO: recieve data from probe B
+                cout << "DataHub recieved data from Probe B PID: " << msg.content << endl;
+                cout << "MsgType is: " << msg.mtype << endl; 
+                if (msg_count >= 10000) {
+                    force_patch(msg.content);
+                }
 
             } else if (msg.mtype % rho == 0) {
-
-                //TODO: recieve data from probe C
+                cout << "DataHub recieved data from Probe C PID: " << msg.content << endl;
+                cout << "MsgType is: " << msg.mtype << endl; 
 
             } else {break;}
         } else {
