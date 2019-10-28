@@ -12,14 +12,13 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdlib>
+#include <signal.h>
+
+// the function signals the process to terminate (SIGKILL)
+// pid of the process to terminate
+int force_patch(pid_t pid);
 
 using namespace std;
-
-int kill_process(process_PID){
-
-    //TODO Run Kill Process program
-
-}
 
 int main() {
     int alpha = 997, beta = 257, rho = 251;
@@ -35,14 +34,16 @@ int main() {
     bool running = true;
     buf reply;
     int msg_count = 0;
+
     bool probe_b_running = true;
     int probe_b_PID;
+    bool need_probe_b_PID = true;
 
     while (running) {
 
         if (probe_b_running & msg_count>9999){
-            kill_process(probe_b_PID);
             probe_b_running = false;
+            force_patch(probe_b_PID);
         }
 
         //msgrcv recieves all message types
@@ -62,7 +63,10 @@ int main() {
                 cout << "DataHub recieved data from Probe B PID: " << msg.content << endl;
                 cout << "MsgType is: " << msg.mtype << endl; 
                 
-                probe_b_PID = //TODO Get PID from Probe B message
+                if (need_probe_b_PID){
+                    probe_b_PID = atoi(msg.content); 
+                    need_probe_b_PID = false;
+                }
                 
             } else if (msg.mtype % rho == 0) { //Probe C
                 cout << "DataHub recieved data from Probe C PID: " << msg.content << endl;
