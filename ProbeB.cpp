@@ -17,29 +17,27 @@
 using namespace std;
 
 int main() {
-    //int alpha = 997, beta = 257, rho = 251;
-    int magic_seed = 257; //beta
-    int qid = msgget(ftok(".",'u'), 0); 
 
+    int magic_seed = 7001; // beta
+    int qid = msgget(ftok(".",'u'), 0);
+    
     struct buf {
-		long mtype; // required
-		char content[50]; // mesg content
-	};
+        long mtype;
+        char content[50];
+    };
 
     buf msg;
     int size = sizeof(msg) - sizeof(long);
     int pid = getpid();
-    int return_mtype;
-    bool run = true;
+    int rand_num;
 
-    while (run) {
-        msg.mtype = return_mtype = rand();
-        
-        if (msg.mtype % magic_seed == 0) {
-            strcpy(msg.content, to_string(pid).c_str()); // add pid to msg.content in form of C-string
+    while (true) {
+        rand_num = rand();
+        if (rand_num % magic_seed == 0) {
+            msg.mtype = magic_seed;
+            strncpy(msg.content, to_string(pid).c_str(), size);
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
+            cout << "Probe B: " << msg.content << ": " << msg.mtype << endl;
         }
     }
-
-    exit(0);
 }

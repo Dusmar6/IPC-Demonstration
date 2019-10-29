@@ -19,8 +19,8 @@
 using namespace std;
 
 int main() {
-    //int alpha = 997, beta = 257, rho = 251;
-    int magic_seed = 997; //alpha
+
+    int magic_seed = 21011; // alpha
     int qid = msgget(ftok(".",'u'), 0); 
 
     struct buf {
@@ -31,21 +31,25 @@ int main() {
     buf msg;
     int size = sizeof(msg) - sizeof(long);
     int pid = getpid();
-    int return_mtype;
+    int return_mtype = 2000;
+    int rand_num;
     
     do {
-        msg.mtype = return_mtype = rand();
+        rand_num = rand();
         
-        if (msg.mtype % magic_seed == 0) {
-            strcpy(msg.content, to_string(pid).c_str()); // add pid to msg.content in 
-                                                         // form of C-string
+        if (rand_num % magic_seed == 0) {
+            msg.mtype = magic_seed;
+            strncpy(msg.content, to_string(pid).c_str(), size); // add pid to msg.content in 
+                                                                // form of C-string
+            cout << "Probe A: " << msg.content << ": " << msg.mtype << endl;
+
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
             msgrcv(qid, (struct msgbuf *)&msg, size, return_mtype, 0);
-
             cout << msg.content << ": " << msg.mtype << endl;
+
         }
 
-    } while (msg.mtype > 100);
-
+    } while (rand_num > 100);
+    cout << "Probe A terminating\n";
     exit(0);
 }

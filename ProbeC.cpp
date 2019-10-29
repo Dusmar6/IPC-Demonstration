@@ -1,5 +1,3 @@
-
-
 //  Saul Hernandez
 //  Dustin
 //  ProbeA.cpp, ProbeB.cpp, ProbeC.cpp, DataHub.cpp
@@ -15,43 +13,36 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <string>
-#include <signal.h>
-#include <unistd.h>
-
+#include "kill_patch.h"
 
 using namespace std;
 
-// the function sends one message to the queue, when the user enters the kill command (SIGUSR1) & terminates the process
-// qid - id of attached queue (retval from msgget)
-// exitmsg - pointer to message object contains the exit message to its recipient
-// size - size of the message object
-// mtype - mtype associated with this message object
-void kill_patch(int qid, struct msgbuf *exitmsg, int size, long mtype);
-
 int main() {
-    //int alpha = 997, beta = 257, rho = 251;
-    int magic_seed = 251; //rho
-    int qid = msgget(ftok(".",'u'), 0); 
 
     struct buf {
-		long mtype; // required
-		char content[50]; // mesg content
-	};
+        long mtype;
+        char content[50];
+    };
+    buf msg, exit_msg;
 
-    buf msg;
     int size = sizeof(msg) - sizeof(long);
     int pid = getpid();
-    int return_mtype;
-    bool run = true;
+    int rand_num;
 
-    while (run) {
-        msg.mtype = return_mtype = rand();
-        
-        if (msg.mtype % magic_seed == 0) {
-            strcpy(msg.content, to_string(pid).c_str()); // add pid to msg.content in form of C-string
+    strncpy(exit_msg.content, "Final Message", size);
+    exit_msg.mtype = 10;
+
+    int magic_seed = 21001;
+    int qid = msgget(ftok(".",'u'), 0);
+    kill_patch(qid, (struct msgbuf *)&exit_msg, size, 10);
+
+    while (true) {
+        rand_num = rand();
+        if (rand_num % magic_seed == 0) {
+            msg.mtype = magic_seed;
+            strncpy(msg.content, to_string(pid).c_str(), size);
             msgsnd(qid, (struct msgbuf *)&msg, size, 0);
+            cout << "Probe C:" << msg.content << ": " << msg.mtype << endl;            
         }
     }
-
-    exit(0);
 }
